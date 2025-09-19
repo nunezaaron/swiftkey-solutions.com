@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftKey Solutions - AI, Automation & Data Solutions</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #F17A1D;
+            --dark-gray: #30362F;
+            --charcoal: #18181b; /* New darker, non-blue gray */
+            --navy-blue: #202738;
+            --muted-gray: #878E76;
+            --white: #FFFFFF;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-gray);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .text-orange { color: var(--orange); }
+        .bg-orange { background-color: var(--orange); }
+        .border-orange { border-color: var(--orange); }
+        .bg-navy-dark { background-color: var(--navy-blue); }
+        .bg-dark-gray { background-color: var(--dark-gray); }
+        .bg-charcoal { background-color: var(--charcoal); }
+        
+        .glass-pane {
+            background-color: rgba(48, 54, 47, 0.5);
+            border: 1px solid rgba(135, 142, 118, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .form-input {
+            background-color: var(--white);
+            color: var(--dark-gray);
+            border: 1px solid var(--muted-gray);
+        }
+        .form-input::placeholder { color: var(--muted-gray); }
+        .content-section {
+            position: relative;
+            z-index: 2;
+        }
+        .parallax-video-container {
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            width: 100%;
+            overflow: hidden;
+        }
+        .parallax-video-container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(10, 10, 20, 0.5); /* Smoked glass overlay */
+            z-index: 2;
+        }
+        .parallax-video {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%; min-height: 100%;
+            width: auto; height: auto;
+            object-fit: cover;
+            z-index: 1;
+        }
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: var(--navy-blue);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader-logo { filter: drop-shadow(0px 0px 15px rgba(241, 122, 29, 0.5)); }
+        .text-shadow { text-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5); }
+        .timeline-line { transform-origin: top; }
+
+        /* Page Modals */
+        .page-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+            overflow-y: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(32, 39, 56, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .page-modal.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease;
+        }
+        .close-modal-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 910;
+        }
+        .prose { color: #d1d5db; }
+        .prose h1, .prose h2, .prose h3 { color: var(--white); }
+        .prose a { color: var(--orange); }
+        .hero-content > * { opacity: 0; }
+        .ai-icon-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <img src="https://files.catbox.moe/zcy9ud.png" alt="SwiftKey Solutions Logo" class="h-16 loader-logo">
+    </div>
+
+    <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300" id="header">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <button id="hamburger-button" aria-label="Open menu" class="text-gray-300 hover:text-white z-20">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <a href="#hero" class="flex items-center space-x-2">
+                    <img src="https://files.catbox.moe/zcy9ud.png" alt="SwiftKey Solutions Logo" class="h-8">
+                    <span class="font-montserrat text-xl text-white">
+                        <span class="font-semibold">Swift<span class="text-orange">Key</span></span>
+                        <span class="font-light">Solutions</span>
+                    </span>
+                </a>
+            </div>
+            <button id="client-portal-button" class="bg-orange text-white font-semibold py-2 px-6 rounded-lg hover:bg-orange-600 transition-colors">
+                Client Portal
+            </button>
+        </div>
+    </header>
+
+    <!-- Flyout Menu -->
+    <div id="flyout-menu" class="fixed top-0 left-0 w-64 h-full glass-pane shadow-lg z-[60] transform -translate-x-full transition-transform duration-300">
+        <nav class="mt-24 flex flex-col space-y-4 px-6">
+            <a href="#hero" class="flyout-link text-gray-300 hover:text-orange text-lg">Home</a>
+            <a href="#vision" class="flyout-link text-gray-300 hover:text-orange text-lg">Our Vision</a>
+            <a href="#services" class="flyout-link text-gray-300 hover:text-orange text-lg">Services</a>
+            <a href="#" data-target="pricing-page" class="flyout-link text-gray-300 hover:text-orange text-lg">Pricing</a>
+            <a href="#approach" class="flyout-link text-gray-300 hover:text-orange text-lg">Our Approach</a>
+            <a href="#tech" class="flyout-link text-gray-300 hover:text-orange text-lg">Technology</a>
+            <a href="#roadmap" class="flyout-link text-gray-300 hover:text-orange text-lg">Roadmap</a>
+            <a href="#results" class="flyout-link text-gray-300 hover:text-orange text-lg">Results</a>
+            <a href="#" data-target="contact-page" class="flyout-link text-gray-300 hover:text-orange text-lg">Contact Us</a>
+            <a href="#" data-target="privacy-page" class="flyout-link text-gray-300 hover:text-orange text-lg">Privacy Policy</a>
+            <a href="#" data-target="mailing-list-page" class="flyout-link text-gray-300 hover:text-orange text-lg">Join Waitlist</a>
+        </nav>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="h-screen flex items-center justify-center text-center relative overflow-hidden">
+             <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
+                <source src="https://files.catbox.moe/drztlp.mp4" type="video/mp4" />
+            </video>
+            <div class="absolute inset-0 bg-black/60 z-10"></div>
+            <div class="z-20 relative flex flex-col items-center hero-content">
+                <img src="https://files.catbox.moe/zcy9ud.png" alt="SwiftKey Solutions Logo" class="h-24 md:h-32 mb-4" style="filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));">
+                <h1 class="font-montserrat text-5xl md:text-7xl text-white text-shadow">
+                    <span class="font-semibold">Swift<span class="text-orange">Key</span></span>
+                    <span class="font-light">Solutions</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 mt-4">We're perfecting our platform. Full launch coming soon.</p>
+                <a href="#" data-target="mailing-list-page" class="bg-orange text-white font-semibold py-3 px-8 rounded-lg hover:bg-orange-600 transition-colors text-lg mt-8 inline-block hero-btn">
+                    Be The First To Know
+                </a>
+            </div>
+        </section>
+
+        <!-- Vision Section -->
+        <section id="vision" class="py-24 content-section bg-dark-gray">
+             <div class="container mx-auto px-6 text-center">
+                 <div class="max-w-4xl mx-auto">
+                    <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-4 leading-tight vision-title" data-splitting>
+                       Augmenting <span class="text-orange">Human</span> Potential.
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto vision-p">
+                       We see AI not as a replacement for human talent, but as a powerful force for human augmentation. We're building a future where AI and humans work in a symbiotic partnership, driving unprecedented growth and innovation.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <div class="parallax-video-container">
+             <video autoplay loop muted playsinline class="parallax-video">
+                <source src="https://files.catbox.moe/gui7lm.mp4" type="video/mp4" />
+            </video>
+        </div>
+
+        <!-- Services Section -->
+        <section id="services" class="py-24 content-section bg-charcoal">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold">What We're <span class="text-orange">Building</span></h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="perspective: 1000px;">
+                    <div class="glass-pane p-8 rounded-2xl service-card">
+                        <h3 class="text-2xl font-bold mb-3">AI & Automation <span class="text-orange">Strategy</span></h3>
+                        <p class="text-gray-300">A comprehensive plan that outlines how your organization will leverage AI to achieve specific business goals. We define the 'why,' 'what,' and 'how' to create a cohesive, company-wide initiative.</p>
+                    </div>
+                    <div class="glass-pane p-8 rounded-2xl service-card">
+                        <h3 class="text-2xl font-bold mb-3">Operations <span class="text-orange">Automation</span></h3>
+                        <p class="text-gray-300">Using technology to automate repetitive, rule-based business processes across departments, freeing up employees from manual work to focus on more strategic, value-adding activities.</p>
+                    </div>
+                    <div class="glass-pane p-8 rounded-2xl service-card">
+                        <h3 class="text-2xl font-bold mb-3"><span class="text-orange">NLP</span> Solutions</h3>
+                        <p class="text-gray-300">Enabling machines to understand, interpret, and generate human language. Perfect for sentiment analysis, intelligent chatbots, and automated document processing.</p>
+                    </div>
+                     <div class="glass-pane p-8 rounded-2xl service-card">
+                        <h3 class="text-2xl font-bold mb-3">Knowledge <span class="text-orange">Management</span> Systems</h3>
+                        <p class="text-gray-300">Centralizing your organization's collective knowledge to prevent loss of expertise, accelerate training, and ensure consistent decision-making across the board.</p>
+                    </div>
+                    <div class="glass-pane p-8 rounded-2xl service-card">
+                        <h3 class="text-2xl font-bold mb-3">Data Automation & <span class="text-orange">Pipelines</span></h3>
+                        <p class="text-gray-300">Designing and implementing automated data workflows (ETL/ELT) to ensure your data is timely, accurate, and ready for analysis, supporting effective Business Intelligence.</p>
+                    </div>
+                    <div class="glass-pane p-8 rounded-2xl service-card">
+                        <h3 class="text-2xl font-bold mb-3"><span class="text-orange">Security</span> by Design</h3>
+                        <p class="text-gray-300">Integrating robust security and data privacy into every solution, featuring end-to-end encryption, strict access controls, and compliance with standards like GDPR and HIPAA.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-24 content-section bg-dark-gray">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Flexible <span class="text-orange">Pricing</span> for Every Need</h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto mb-12">Our cost structure is flexible and based on factors such as data volume, complexity, and service level agreements, with transparent pricing tailored to your budget.</p>
+                <a href="#" data-target="pricing-page" class="bg-orange text-white font-semibold py-3 px-8 rounded-lg hover:bg-orange-600 transition-colors text-lg inline-block">
+                    View Pricing Tiers
+                </a>
+            </div>
+        </section>
+        
+        <div class="parallax-video-container">
+             <video autoplay loop muted playsinline class="parallax-video">
+                <source src="https://files.catbox.moe/6gdkix.mp4" type="video/mp4" />
+            </video>
+        </div>
+        
+        <!-- Our Approach Section -->
+        <section id="approach" class="py-24 content-section bg-charcoal">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold">Our <span class="text-orange">Approach</span></h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="approach-card text-center p-4">
+                        <div class="flex justify-center mb-4"><svg class="w-16 h-16 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m-9 9a9 9 0 019-9"></path></svg></div>
+                        <h3 class="text-xl font-bold mb-2">Holistic View</h3>
+                        <p class="text-gray-400">We look at your entire business ecosystem—people, processes, and technology.</p>
+                    </div>
+                    <div class="approach-card text-center p-4">
+                        <div class="flex justify-center mb-4"><svg class="w-16 h-16 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h5M20 20v-5h-5M4 4l16 16"></path></svg></div>
+                        <h3 class="text-xl font-bold mb-2">Agile & Iterative</h3>
+                        <p class="text-gray-400">We break down large projects into smaller sprints to deliver value quickly.</p>
+                    </div>
+                    <div class="approach-card text-center p-4">
+                        <div class="flex justify-center mb-4"><svg class="w-16 h-16 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-5M3 4h5v5m-2-2l-3-3m15 15l3 3M4 20h5v-5M3 9V4h5"></path></svg></div>
+                        <h3 class="text-xl font-bold mb-2">Knowledge Transfer</h3>
+                        <p class="text-gray-400">We empower your team by providing training and comprehensive documentation.</p>
+                    </div>
+                    <div class="approach-card text-center p-4">
+                        <div class="flex justify-center mb-4"><svg class="w-16 h-16 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h-2a2 2 0 01-2-2V7a2 2 0 012-2h2m6 0h2a2 2 0 012 2v10a2 2 0 01-2 2h-2"></path></svg></div>
+                        <h3 class="text-xl font-bold mb-2">Measurable Outcomes</h3>
+                        <p class="text-gray-400">We define and track KPIs to ensure a clear return on your investment.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology Section -->
+        <section id="tech" class="py-24 content-section bg-dark-gray">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold">Technology <span class="text-orange">Agnostic</span>, Client <span class="text-orange">Centric</span></h2>
+                     <p class="text-lg text-gray-300 max-w-3xl mx-auto mt-4">We are not married to any one platform. Our diverse expertise means we can objectively recommend and implement the best solution for your unique needs.</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-10 items-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS Logo" class="h-12 mx-auto tech-logo grayscale hover:grayscale-0 transition duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Google_Cloud_logo.svg" alt="Google Cloud Logo" class="h-12 mx-auto tech-logo grayscale hover:grayscale-0 transition duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Microsoft_Azure_Logo.svg" alt="Azure Logo" class="h-12 mx-auto tech-logo grayscale hover:grayscale-0 transition duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c6/Snowflake_Logo.svg" alt="Snowflake Logo" class="h-12 mx-auto tech-logo grayscale hover:grayscale-0 transition duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/Databricks_Logo.svg" alt="Databricks Logo" class="h-12 mx-auto tech-logo grayscale hover:grayscale-0 transition duration-300">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Tableau_Logo.svg" alt="Tableau Logo" class="h-10 mx-auto tech-logo grayscale hover:grayscale-0 transition duration-300">
+                </div>
+                <div class="border-t border-gray-700 my-16"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                    <div class="ai-icon-container">
+                        <svg class="w-20 h-20 mx-auto text-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <path class="ai-icon-path" d="M12 2a10 10 0 1 0 10 10" />
+                            <path class="ai-icon-path" d="M12 2L12 6" />
+                            <path class="ai-icon-path" d="M12 22L12 18" />
+                            <path class="ai-icon-path" d="M22 12L18 12" />
+                            <path class="ai-icon-path" d="M2 12L6 12" />
+                            <path class="ai-icon-path" d="M4.93 4.93L7.76 7.76" />
+                            <path class="ai-icon-path" d="M19.07 19.07L16.24 16.24" />
+                            <path class="ai-icon-path" d="M4.93 19.07L7.76 16.24" />
+                            <path class="ai-icon-path" d="M19.07 4.93L16.24 7.76" />
+                            <circle class="ai-icon-path" cx="12" cy="12" r="3" stroke-width="1.5"/>
+                        </svg>
+                        <h4 class="mt-4 font-bold text-lg">Core AI Integration</h4>
+                    </div>
+                    <div class="ai-icon-container">
+                        <svg class="w-20 h-20 mx-auto text-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                           <path class="ai-icon-path" d="M3 17l6-6 4 4 8-8" />
+                           <path class="ai-icon-path" d="M17 7h4v4" />
+                           <path class="ai-icon-path" d="M3 7v10h18" />
+                        </svg>
+                         <h4 class="mt-4 font-bold text-lg">Data Processing & Analytics</h4>
+                    </div>
+                     <div class="ai-icon-container">
+                        <svg class="w-20 h-20 mx-auto text-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <path class="ai-icon-path" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10z"/>
+                            <line class="ai-icon-path" x1="9" y1="10" x2="15" y2="10" />
+                            <line class="ai-icon-path" x1="9" y1="13" x2="13" y2="13" />
+                        </svg>
+                        <h4 class="mt-4 font-bold text-lg">Natural Language Processing</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Roadmap Section -->
+        <section id="roadmap" class="py-24 content-section bg-charcoal">
+            <div class="container mx-auto px-6">
+                 <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold">Development <span class="text-orange">Roadmap</span></h2>
+                </div>
+                <div class="relative wrap overflow-hidden p-10 h-full">
+                    <div class="border-2-2 absolute border-opacity-20 border-gray-700 h-full border timeline-line" style="left: 50%"></div>
+                     <!-- right timeline -->
+                    <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                        <div class="order-1 w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-dark-gray shadow-xl w-8 h-8 rounded-full"><h1 class="mx-auto font-semibold text-lg text-white">1</h1></div>
+                        <div class="order-1 glass-pane rounded-lg shadow-xl w-5/12 px-6 py-4">
+                            <h3 class="mb-3 font-bold text-white text-xl">Q2 2025 - Foundation</h3>
+                            <p class="text-sm leading-snug tracking-wide text-gray-300">Core infrastructure and AI model development initiated. Secured seed funding.</p>
+                        </div>
+                    </div>
+                    <!-- left timeline -->
+                    <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                        <div class="order-1 w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-dark-gray shadow-xl w-8 h-8 rounded-full"><h1 class="mx-auto text-white font-semibold text-lg">2</h1></div>
+                        <div class="order-1 glass-pane rounded-lg shadow-xl w-5/12 px-6 py-4">
+                            <h3 class="mb-3 font-bold text-white text-xl">Q3 2025 - Alpha Testing</h3>
+                            <p class="text-sm leading-snug tracking-wide text-gray-300">Internal testing of automation pipelines and NLP solutions. Began partner outreach.</p>
+                        </div>
+                    </div>
+                    <!-- right timeline -->
+                    <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                        <div class="order-1 w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-orange shadow-xl w-8 h-8 rounded-full"><h1 class="mx-auto font-semibold text-lg text-white">✓</h1></div>
+                        <div class="order-1 glass-pane rounded-lg shadow-xl w-5/12 px-6 py-4">
+                            <h3 class="mb-3 font-bold text-white text-xl">Q4 2025 - We Are Here</h3>
+                            <p class="text-sm leading-snug tracking-wide text-gray-300">Closed beta with select partners and intensive feature refinement. Finalizing UI/UX.</p>
+                        </div>
+                    </div>
+                     <!-- left timeline -->
+                    <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                        <div class="order-1 w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-dark-gray shadow-xl w-8 h-8 rounded-full"><h1 class="mx-auto text-white font-semibold text-lg">4</h1></div>
+                        <div class="order-1 glass-pane rounded-lg shadow-xl w-5/12 px-6 py-4">
+                            <h3 class="mb-3 font-bold text-white text-xl">Q1 2026 - Public Launch</h3>
+                            <p class="text-sm leading-snug tracking-wide text-gray-300">Platform goes live! Onboarding of our waitlist clients and scaling operations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tangible Results Section -->
+        <section id="results" class="py-24 content-section bg-dark-gray">
+             <div class="container mx-auto px-6">
+                 <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold">Tangible <span class="text-orange">Results</span></h2>
+                </div>
+                <div class="glass-pane rounded-2xl p-8 md:p-12 lg:flex items-center gap-12">
+                     <div class="lg:w-1/2">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" class="rounded-lg w-full shadow-lg">
+                    </div>
+                    <div class="lg:w-1/2 mt-8 lg:mt-0">
+                        <h3 class="text-3xl font-bold mb-4">The Impact of Automation</h3>
+                        <p class="text-gray-300 mb-6">Our prototype solution, deployed for a mid-sized logistics partner, achieved transformative results.</p>
+                        <ul class="space-y-4 text-xl">
+                            <li class="flex items-start">
+                                <strong class="text-orange text-3xl mr-4 mt-1">✓</strong> 
+                                <div><span class="font-bold text-4xl result-number" data-target="95">0</span><span class="font-bold text-4xl">%</span> reduction in data entry errors.</div>
+                            </li>
+                            <li class="flex items-start">
+                                <strong class="text-orange text-3xl mr-4 mt-1">✓</strong> 
+                                <div><span class="font-bold text-4xl result-number" data-target="20">0</span><span class="font-bold text-4xl">%</span> decrease in operational costs.</div>
+                            </li>
+                             <li class="flex items-start">
+                                <strong class="text-orange text-3xl mr-4 mt-1">✓</strong> 
+                                <div><span class="font-bold text-4xl result-number" data-target="15">0</span><span class="font-bold text-4xl">%</span> on-time delivery boost.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="py-8 content-section bg-charcoal">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p>&copy; 2025 SwiftKey Solutions. All Rights Reserved.</p>
+            <div class="mt-4 space-x-6">
+                <a href="#" data-target="privacy-page" class="hover:text-orange">Privacy Policy</a>
+                <a href="#" data-target="contact-page" class="hover:text-orange">Contact Us</a>
+                <a href="#" data-target="mailing-list-page" class="hover:text-orange">Join Our Waitlist</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- MODALS & OVERLAYS -->
+
+    <!-- Client Portal Modal -->
+    <div id="client-portal-modal" class="fixed inset-0 bg-black bg-opacity-70 z-[70] flex items-center justify-center hidden">
+        <div class="glass-pane p-8 rounded-lg shadow-xl w-full max-w-md relative">
+             <button id="close-portal-modal-button" class="absolute top-4 right-4 text-gray-300 hover:text-white text-2xl">&times;</button>
+            <h2 class="text-2xl font-bold mb-6 text-center">Client Portal <span class="text-orange">Login</span></h2>
+            <form>
+                 <div class="mb-4">
+                    <input type="text" placeholder="Username" class="w-full px-4 py-3 form-input rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+                <div class="mb-6">
+                    <input type="password" placeholder="Password" class="w-full px-4 py-3 form-input rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+                <button type="submit" class="w-full bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange-600 transition-colors">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pricing Page Modal -->
+    <div id="pricing-page" class="page-modal">
+        <button class="close-modal-btn text-white text-4xl">&times;</button>
+        <div class="container mx-auto px-6 py-12">
+            <div class="text-center mb-16">
+                <h1 class="text-5xl font-bold">Transparent <span class="text-orange">Pricing</span></h1>
+                <p class="text-gray-300 mt-4 max-w-2xl mx-auto">Flexible plans designed to scale with your business. Choose the tier that best fits your automation and data needs.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Tier 1 -->
+                <div class="glass-pane rounded-2xl p-8 flex flex-col">
+                    <h3 class="text-2xl font-bold text-orange mb-4">Starter</h3>
+                    <p class="text-5xl font-bold mb-2">TBD</p>
+                    <p class="text-gray-400 mb-6">For teams just getting started with automation.</p>
+                    <ul class="space-y-3 text-gray-300 flex-grow">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Basic Data Pipeline Setup</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>1-2 Process Automations</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Monthly Health Checks</li>
+                    </ul>
+                    <a href="#" data-target="contact-page" class="mt-8 w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange-600 transition-colors">Get Started</a>
+                </div>
+                <!-- Tier 2 -->
+                <div class="glass-pane rounded-2xl p-8 flex flex-col border-2 border-orange scale-105">
+                     <p class="text-center font-semibold bg-orange text-white py-1 px-4 rounded-full -mt-12 mb-4 self-center">Most Popular</p>
+                    <h3 class="text-2xl font-bold text-orange mb-4">Growth</h3>
+                    <p class="text-5xl font-bold mb-2">TBD</p>
+                    <p class="text-gray-400 mb-6">For businesses ready to scale their operations.</p>
+                    <ul class="space-y-3 text-gray-300 flex-grow">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Everything in Starter, plus:</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Advanced NLP Solutions</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Real-time Data Processing</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Priority Support</li>
+                    </ul>
+                     <a href="#" data-target="contact-page" class="mt-8 w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange-600 transition-colors">Get Started</a>
+                </div>
+                <!-- Tier 3 -->
+                <div class="glass-pane rounded-2xl p-8 flex flex-col">
+                    <h3 class="text-2xl font-bold text-orange mb-4">Enterprise</h3>
+                    <p class="text-5xl font-bold mb-2">TBD</p>
+                    <p class="text-gray-400 mb-6">For large-scale, custom deployments.</p>
+                    <ul class="space-y-3 text-gray-300 flex-grow">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Everything in Growth, plus:</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Custom AI Model Development</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Dedicated Knowledge Management System</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-orange mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>24/7 Dedicated Support</li>
+                    </ul>
+                     <a href="#" data-target="contact-page" class="mt-8 w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange-600 transition-colors">Get Started</a>
+                </div>
+            </div>
+             <div class="text-center mt-20">
+                <h2 class="text-3xl font-bold">One-Time <span class="text-orange">Projects</span></h2>
+                <p class="text-gray-300 mt-4 max-w-2xl mx-auto">Need a specific, one-off solution? We've got you covered.</p>
+                <div class="mt-8 inline-flex flex-col md:flex-row gap-4">
+                    <div class="glass-pane p-6 rounded-lg">Branding Kits - Price TBD</div>
+                    <div class="glass-pane p-6 rounded-lg">Custom Website/App Templates - Price TBD</div>
+                    <div class="glass-pane p-6 rounded-lg">Single Process Automation - Price TBD</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Page Modal -->
+     <div id="contact-page" class="page-modal">
+        <button class="close-modal-btn text-white text-4xl">&times;</button>
+        <div class="glass-pane rounded-2xl p-8 md:p-12 max-w-2xl mx-auto w-full">
+            <div class="form-wrapper">
+                <h1 class="text-4xl font-bold text-center mb-2">Get In <span class="text-orange">Touch</span></h1>
+                <p class="text-center text-gray-300 mb-8">Have a question or a project in mind? Let's talk.</p>
+                <form id="contact-form">
+                    <div id="user-info" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                            <input type="text" id="name" name="name" class="w-full px-4 py-3 form-input rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-3 form-input rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="message" class="block text-sm font-medium text-gray-300 mb-1">Message</label>
+                        <textarea id="message" name="message" rows="5" required class="w-full px-4 py-3 form-input rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                    </div>
+                    <div class="mb-6 flex items-center">
+                        <input type="checkbox" id="anonymous" name="anonymous" class="h-4 w-4 text-orange-600 bg-gray-700 border-gray-600 rounded focus:ring-orange-500">
+                        <label for="anonymous" class="ml-2 block text-sm text-gray-300">Send anonymously</label>
+                    </div>
+                    <button type="submit" class="w-full bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange-600 transition-colors">Send Message</button>
+                </form>
+            </div>
+             <div class="success-message hidden text-center">
+                <h2 class="text-3xl font-bold text-orange">Thank You!</h2>
+                <p class="text-gray-300 mt-2">Your message has been sent. We'll be in touch soon.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mailing List Page Modal -->
+    <div id="mailing-list-page" class="page-modal">
+         <button class="close-modal-btn text-white text-4xl">&times;</button>
+        <div class="glass-pane rounded-2xl p-8 md:p-12 max-w-2xl mx-auto w-full">
+            <div class="form-wrapper">
+                <h1 class="text-4xl font-bold text-center mb-2">Be The First To <span class="text-orange">Know</span></h1>
+                <p class="text-center text-gray-300 mb-8">Join our mailing list for exclusive updates on our launch, promotions, and insights into the world of AI.</p>
+                <form id="mailing-list-form">
+                    <div class="mb-4">
+                        <label for="mail-email" class="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                        <input type="email" id="mail-email" name="email" required class="w-full px-4 py-3 form-input rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="you@example.com">
+                    </div>
+                    <button type="submit" class="w-full bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange-600 transition-colors">Subscribe</button>
+                </form>
+            </div>
+            <div class="success-message hidden text-center">
+                <h2 class="text-3xl font-bold text-orange">Subscribed!</h2>
+                <p class="text-gray-300 mt-2">Thanks for joining our waitlist. You'll be the first to hear about our launch.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Privacy Policy Page Modal -->
+    <div id="privacy-page" class="page-modal">
+        <button class="close-modal-btn text-white text-4xl">&times;</button>
+        <div class="glass-pane rounded-2xl p-8 md:p-12 max-w-4xl mx-auto w-full h-full max-h-[90vh] overflow-y-auto">
+             <div class="prose prose-lg w-full max-w-none">
+                <h1>Privacy Policy for <span class="text-orange">SwiftKey Solutions</span></h1>
+                <p><strong>Last Updated:</strong> September 19, 2025</p>
+                <p>SwiftKey Solutions ("us", "we", or "our") operates this website (the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.</p>
+                <h2>Information Collection and Use</h2>
+                <p>We collect several different types of information for various purposes to provide and improve our Service to you.</p>
+                <h3>Types of Data Collected</h3>
+                <h4>Personal Data</h4>
+                <p>While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you ("Personal Data"). Personally, identifiable information may include, but is not limited to: Email address, First name and last name, Cookies and Usage Data.</p>
+                <h4>Usage Data</h4>
+                <p>We may also collect information on how the Service is accessed and used ("Usage Data"). This Usage Data may include information such as your computer's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that you visit, the time and date of your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
+                <h2>Use of Data</h2>
+                <p>SwiftKey Solutions uses the collected data for various purposes:</p>
+                <ul><li>To provide and maintain the Service</li><li>To notify you about changes to our Service</li><li>To allow you to participate in interactive features of our Service when you choose to do so</li><li>To provide customer care and support</li><li>To provide analysis or valuable information so that we can improve the Service</li><li>To monitor the usage of the Service</li><li>To detect, prevent and address technical issues</li></ul>
+                <h2>Security of Data</h2>
+                <p>The security of your data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
+                <h2>Contact Us</h2>
+                <p>If you have any questions about this Privacy Policy, please contact us by visiting the contact page on our website.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/splitting/dist/splitting.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        Splitting();
+
+        let heroAnimationHasRun = false; // Animation flag
+        window.addEventListener('load', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            gsap.to(loadingScreen, { opacity: 0, duration: 1, delay: 0.5, onComplete: () => {
+                loadingScreen.style.display = 'none';
+                if (!heroAnimationHasRun) {
+                    gsap.fromTo('.hero-content > *', { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.2, ease: 'power3.out', duration: 1 });
+                    heroAnimationHasRun = true;
+                }
+            }});
+        });
+
+        // --- HEADER & MENU ---
+        gsap.to("#header", {
+            backgroundColor: "rgba(32, 39, 56, 0.5)",
+            backdropFilter: "blur(12px)",
+            scrollTrigger: { trigger: "body", start: "top top", end: "+=100", scrub: 1 },
+        });
+        
+        const hamburgerButton = document.getElementById('hamburger-button');
+        const flyoutMenu = document.getElementById('flyout-menu');
+        hamburgerButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            flyoutMenu.classList.toggle('-translate-x-full')
+        });
+        
+        const clientPortalButton = document.getElementById('client-portal-button');
+        const clientPortalModal = document.getElementById('client-portal-modal');
+        const closePortalModalButton = document.getElementById('close-portal-modal-button');
+        clientPortalButton.addEventListener('click', () => clientPortalModal.classList.remove('hidden'));
+        closePortalModalButton.addEventListener('click', () => clientPortalModal.classList.add('hidden'));
+
+        // --- 3D & SCROLL ANIMATIONS ---
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const { left, top, width, height } = card.getBoundingClientRect();
+                const x = (e.clientX - left - width / 2) / 25;
+                const y = (e.clientY - top - height / 2) / 25;
+                gsap.to(card, { rotationY: x, rotationX: -y, transformPerspective: 1000, ease: "power1.out" });
+            });
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, { rotationY: 0, rotationX: 0, ease: "power1.out" });
+            });
+        });
+
+        gsap.from('.vision-title .char', { scrollTrigger: { trigger: "#vision", start: 'top 80%', toggleActions: 'play none none none'}, y: '100%', opacity: 0, stagger: 0.03, ease: 'back.out(1.7)', duration: 1 });
+        gsap.from('.vision-p', { scrollTrigger: { trigger: "#vision", start: 'top 70%', toggleActions: 'play none none none'}, opacity: 0, y: 30, ease: 'power3.out', duration: 1 });
+        gsap.from(".timeline-line", { scaleY: 0, scrollTrigger: { trigger: "#roadmap", start: "top 80%", end: "bottom bottom", scrub: 1 } });
+        gsap.utils.toArray('.right-timeline, .left-timeline').forEach(el => {
+            gsap.from(el, { scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }, opacity: 0, x: el.classList.contains('right-timeline') ? 100 : -100, duration: 1 });
+        });
+        gsap.from(".service-card", { scrollTrigger: { trigger: "#services", start: "top 80%", toggleActions: 'play none none none' }, opacity: 0, y: 50, stagger: 0.1, duration: 0.8 });
+        gsap.from(".approach-card", { scrollTrigger: { trigger: "#approach", start: "top 80%", toggleActions: 'play none none none' }, opacity: 0, y: 50, stagger: 0.2, duration: 0.8 });
+        gsap.from(".tech-logo", { scrollTrigger: { trigger: "#tech", start: "top 80%", toggleActions: 'play none none none' }, opacity: 0, y: 50, stagger: 0.1, duration: 0.8 });
+        
+        gsap.utils.toArray(".ai-icon-container").forEach(container => {
+            gsap.from(container.querySelectorAll('.ai-icon-path'), {
+                strokeDashoffset: 0,
+                duration: 2,
+                ease: 'power2.inOut',
+                stagger: 0.1,
+                scrollTrigger: {
+                    trigger: container,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                }
+            })
+        });
+        
+        gsap.utils.toArray(".result-number").forEach(el => {
+            const target = { val: 0 };
+            gsap.to(target, {
+                val: el.dataset.target,
+                duration: 2,
+                ease: "power1.inOut",
+                onUpdate: () => { el.textContent = Math.round(target.val); },
+                scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
+            });
+        });
+
+        // --- UNIFIED MODAL & MENU LOGIC ---
+        let lastFocusedElement;
+
+        const openModal = (modal) => {
+            if (!modal) return;
+            lastFocusedElement = document.activeElement;
+            const currentlyOpenModal = document.querySelector('.page-modal.active');
+
+            const showNewModal = () => {
+                modal.scrollTop = 0;
+                modal.classList.add('active');
+                gsap.to(modal, { opacity: 1, duration: 0.3 });
+                document.body.style.overflow = 'hidden';
+                const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (firstFocusable) firstFocusable.focus();
+            };
+            
+            if (currentlyOpenModal && currentlyOpenModal !== modal) {
+                 gsap.to(currentlyOpenModal, { opacity: 0, duration: 0.3, onComplete: () => {
+                    currentlyOpenModal.classList.remove('active');
+                    showNewModal();
+                }});
+            } else if (!currentlyOpenModal) {
+                showNewModal();
+            }
+        };
+
+        const closeModal = (modal) => {
+             if (!modal) return;
+             gsap.to(modal, { opacity: 0, duration: 0.3, onComplete: () => {
+                modal.classList.remove('active');
+                if (!document.querySelector('.page-modal.active')) {
+                    document.body.style.overflow = 'auto';
+                }
+                if(lastFocusedElement) lastFocusedElement.focus();
+            }});
+        };
+
+        document.querySelectorAll('[data-target]').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = e.currentTarget.dataset.target;
+                const targetModal = document.getElementById(targetId);
+                openModal(targetModal);
+            });
+        });
+        
+        document.querySelectorAll('.close-modal-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const targetModal = e.currentTarget.closest('.page-modal');
+                closeModal(targetModal);
+            });
+        });
+        
+        document.querySelectorAll('.flyout-link').forEach(link => {
+            link.addEventListener('click', () => {
+                 flyoutMenu.classList.add('-translate-x-full');
+            });
+        });
+        
+        document.addEventListener('keydown', e => {
+            if (e.key === "Escape") {
+                const openModal = document.querySelector('.page-modal.active');
+                if(openModal) closeModal(openModal);
+            }
+        });
+        
+        ['contact-form', 'mailing-list-form'].forEach(formId => {
+            const form = document.getElementById(formId);
+            if(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const wrapper = this.closest('.form-wrapper');
+                    const successMessage = wrapper.nextElementSibling;
+
+                    gsap.to(wrapper, {opacity: 0, duration: 0.3, onComplete: () => {
+                        wrapper.classList.add('hidden');
+                        successMessage.classList.remove('hidden');
+                        gsap.fromTo(successMessage, {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.5});
+                        setTimeout(() => {
+                           closeModal(this.closest('.page-modal'));
+                           // Reset form after closing
+                           setTimeout(() => {
+                                wrapper.classList.remove('hidden');
+                                successMessage.classList.add('hidden');
+                                wrapper.style.opacity = 1;
+                                this.reset();
+                                if(formId === 'contact-form'){
+                                    document.getElementById('anonymous').dispatchEvent(new Event('change'));
+                                }
+                           }, 500);
+                        }, 2500);
+                    }});
+                });
+            }
+        });
+        
+        const anonymousCheckbox = document.getElementById('anonymous');
+        if(anonymousCheckbox){
+            anonymousCheckbox.addEventListener('change', function(e) {
+                const userInfo = document.getElementById('user-info');
+                const nameInput = document.getElementById('name');
+                const emailInput = document.getElementById('email');
+                if (e.target.checked) {
+                    gsap.to(userInfo, { height: 0, opacity: 0, duration: 0.3, onComplete: () => userInfo.style.display = 'none'});
+                    nameInput.required = false;
+                    emailInput.required = false;
+                } else {
+                    userInfo.style.display = 'grid';
+                    gsap.fromTo(userInfo, { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: 0.3 });
+                    nameInput.required = true;
+                    emailInput.required = true;
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
+
